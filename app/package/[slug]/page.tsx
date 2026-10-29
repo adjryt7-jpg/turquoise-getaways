@@ -1,9 +1,24 @@
+import { Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-export const instant = false;
 
-export default async function PackageDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
-  
+// 1. THE STATIC SHELL: Next.js builds this instantly and successfully on Vercel without querying the database.
+export default function PackageDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 text-xl font-bold text-gray-400">
+          Loading trip details...
+        </div>
+      }
+    >
+      <PackageContent params={params} />
+    </Suspense>
+  );
+}
+
+// 2. THE DYNAMIC CONTENT: This only runs when a user actually visits the page, avoiding the build crash.
+async function PackageContent({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
 
@@ -42,7 +57,7 @@ export default async function PackageDetailsPage({ params }: { params: Promise<{
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
       
-      {/* 1. HERO IMAGE BANNER (Still shows the first photo as the huge cover) */}
+      {/* 1. HERO IMAGE BANNER */}
       <div className="relative w-full h-[50vh] md:h-[60vh] bg-gray-900">
         {pkg.images && pkg.images.length > 0 ? (
           <img src={pkg.images[0]} alt={pkg.title} className="w-full h-full object-cover opacity-80" />
@@ -134,7 +149,7 @@ export default async function PackageDetailsPage({ params }: { params: Promise<{
 
         </div>
 
-        {/* RIGHT COLUMN: Booking Form (Unchanged) */}
+        {/* RIGHT COLUMN: Booking Form */}
         <div className="lg:col-span-1">
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-2xl sticky top-8">
             <p className="text-gray-500 font-bold uppercase tracking-wide text-sm mb-1">Starting From</p>
