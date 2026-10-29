@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 
 export default async function PackageDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   
